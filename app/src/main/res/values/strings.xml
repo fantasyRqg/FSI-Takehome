@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name">Hair Salon Appointments</string>
+    
+    <!-- Fragment Labels -->
+    <string name="appointments_title">Today\'s Appointments</string>
+    <string name="appointment_details_title">Appointment Details</string>
+    
+    <!-- Filter Options -->
+    <string name="filter_all">All</string>
+    <string name="filter_available">Available</string>
+    
+    <!-- Empty States -->
+    <string name="empty_appointments">No appointments scheduled for today</string>
+    <string name="empty_available">No available appointments</string>
+    
+    <!-- Appointment Details -->
+    <string name="client_information">Client Information</string>
+    <string name="service_details">Service Details</string>
+    <string name="appointment_time">Appointment Time</string>
+    <string name="notes_label">Notes</string>
+    
+    <!-- Status Labels -->
+    <string name="status_confirmed">CONFIRMED</string>
+    <string name="status_pending">PENDING</string>
+    <string name="status_completed">COMPLETED</string>
+    <string name="status_cancelled">CANCELLED</string>
+    
+    <!-- Formats -->
+    <string name="stylist_format">with %s</string>
+    <string name="duration_format">Duration: %d minutes</string>
+    <string name="price_format">$%.2f</string>
+</resources>

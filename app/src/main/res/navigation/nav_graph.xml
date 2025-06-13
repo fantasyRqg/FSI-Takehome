@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/appointmentListFragment">
+
+    <fragment
+        android:id="@+id/appointmentListFragment"
+        android:name="com.example.hairsalonappointments.ui.appointments.AppointmentListFragment"
+        android:label="Appointments"
+        tools:layout="@layout/fragment_appointment_list">
+        <action
+            android:id="@+id/action_appointmentListFragment_to_appointmentDetailFragment"
+            app:destination="@id/appointmentDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/appointmentDetailFragment"
+        android:name="com.example.hairsalonappointments.ui.detail.AppointmentDetailFragment"
+        android:label="Appointment Details"
+        tools:layout="@layout/fragment_appointment_detail">
+        <argument
+            android:name="appointmentId"
+            app:argType="integer" />
+    </fragment>
+
+</navigation>
