@@ -1,9 +1,11 @@
 package com.example.hairsalonappointments.ui.appointments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -13,6 +15,12 @@ import com.example.hairsalonappointments.data.Appointment
 import com.example.hairsalonappointments.data.AppointmentStatus
 import com.example.hairsalonappointments.data.MockApiService
 import com.example.hairsalonappointments.databinding.FragmentAppointmentListBinding
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.kotlin.addTo
+import io.reactivex.rxjava3.kotlin.subscribeBy
+import io.reactivex.rxjava3.schedulers.Schedulers
 
 /**
  * Fragment for displaying the list of appointments
@@ -29,15 +37,18 @@ import com.example.hairsalonappointments.databinding.FragmentAppointmentListBind
  * - Handle loading and error states appropriately
  */
 class AppointmentListFragment : Fragment() {
-    
+    companion object {
+        private val TAG = AppointmentListFragment::class.simpleName
+    }
+
     private var _binding: FragmentAppointmentListBinding? = null
     private val binding get() = _binding!!
     
     private lateinit var adapter: AppointmentAdapter
-    private lateinit var apiService: MockApiService
+    private val apiService by lazy { MockApiService() }
     private var allAppointments = emptyList<Appointment>()
     private var showingAllAppointments = true
-    
+    private val disposables = CompositeDisposable()
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -82,8 +93,7 @@ class AppointmentListFragment : Fragment() {
     }
     
     /**
-     * TODO: Implement this function
-     * 
+     *
      * Load appointments from the MockApiService.
      * - Initialize the apiService
      * - Call getTodaysAppointments()
@@ -92,19 +102,33 @@ class AppointmentListFragment : Fragment() {
      * - Handle any errors gracefully
      */
     private fun loadAppointments() {
-        // TODO: Implement appointment loading
         // 1. Initialize MockApiService
         // 2. Get today's appointments
         // 3. Store in allAppointments
         // 4. Update the RecyclerView
         // 5. Handle empty state
-        
-        throw NotImplementedError("Candidate needs to implement loadAppointments()")
+
+        Observable.fromCallable {
+            apiService.getTodaysAppointments()
+        }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onNext = {
+                    allAppointments = it
+                    updateAppointmentList()
+                },
+                onError = {
+                    Log.e(TAG, "loadAppointments: $it", it)
+                    Toast.makeText(requireContext(), "Error loading appointments. Err: $it", Toast.LENGTH_SHORT).show()
+                    updateEmptyState(true)
+                }
+            )
+            .addTo(disposables)
     }
-    
+
     /**
-     * TODO: Implement this function
-     * 
+     *
      * Handle appointment item clicks.
      * - Navigate to AppointmentDetailFragment
      * - Pass the appointment ID as an argument
@@ -113,10 +137,12 @@ class AppointmentListFragment : Fragment() {
      * @param appointment The clicked appointment
      */
     private fun onAppointmentClick(appointment: Appointment) {
-        // TODO: Implement navigation to detail screen
         // Use findNavController() and navigate with appointment ID
-        
-        throw NotImplementedError("Candidate needs to implement onAppointmentClick()")
+
+        findNavController().navigate(R.id.action_appointmentListFragment_to_appointmentDetailFragment, Bundle().apply {
+            putInt("appointmentId", appointment.id)
+        })
+//        AppointmentListFragmentDirections.actionAppointmentListFragmentToAppointmentDetailFragment(appointment.id)
     }
     
     /**
@@ -127,9 +153,9 @@ class AppointmentListFragment : Fragment() {
             allAppointments
         } else {
             // Show only pending and confirmed appointments (available for service)
-            allAppointments.filter { 
-                it.status == AppointmentStatus.PENDING || 
-                it.status == AppointmentStatus.CONFIRMED 
+            allAppointments.filter {
+                it.status == AppointmentStatus.PENDING ||
+                        it.status == AppointmentStatus.CONFIRMED
             }
         }
         
@@ -156,6 +182,7 @@ class AppointmentListFragment : Fragment() {
     }
     
     override fun onDestroyView() {
+        disposables.clear()
         super.onDestroyView()
         _binding = null
     }

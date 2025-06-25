@@ -1,6 +1,7 @@
 package com.example.hairsalonappointments.ui.detail
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +11,11 @@ import com.example.hairsalonappointments.data.Appointment
 import com.example.hairsalonappointments.data.AppointmentStatus
 import com.example.hairsalonappointments.data.MockApiService
 import com.example.hairsalonappointments.databinding.FragmentAppointmentDetailBinding
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.kotlin.addTo
+import io.reactivex.rxjava3.schedulers.Schedulers
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -27,16 +33,21 @@ import java.util.Locale
  * - Handle case when appointment is not found
  */
 class AppointmentDetailFragment : Fragment() {
-    
+    companion object {
+        private val TAG = AppointmentDetailFragment::class.simpleName
+    }
+
     private var _binding: FragmentAppointmentDetailBinding? = null
     private val binding get() = _binding!!
     
     private val args: AppointmentDetailFragmentArgs by navArgs()
-    private lateinit var apiService: MockApiService
-    
+    private val apiService by lazy { MockApiService() }
+
     private val timeFormatter = SimpleDateFormat("h:mm a", Locale.getDefault())
     private val dateFormatter = SimpleDateFormat("EEEE, MMMM d", Locale.getDefault())
-    
+
+    private val disposables = CompositeDisposable()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -53,8 +64,7 @@ class AppointmentDetailFragment : Fragment() {
     }
     
     /**
-     * TODO: Implement this function
-     * 
+     *
      * Load and display appointment details.
      * - Initialize MockApiService
      * - Get appointment by ID (from args.appointmentId)
@@ -75,13 +85,23 @@ class AppointmentDetailFragment : Fragment() {
      * - textViewNotes (hide if no notes)
      */
     private fun loadAppointmentDetails() {
-        // TODO: Implement appointment detail loading
         // 1. Initialize MockApiService
         // 2. Get appointment by ID from args
         // 3. Update all UI elements with appointment data
         // 4. Handle null case (appointment not found)
-        
-        throw NotImplementedError("Candidate needs to implement loadAppointmentDetails()")
+
+        Observable.fromCallable {
+            apiService.getAppointmentById(args.appointmentId) ?: throw Exception("Appointment not found")
+        }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ appointment ->
+                displayAppointment(appointment)
+            }, {
+                Log.e(TAG, "loadAppointmentDetails: ", it)
+                showErrorState()
+            })
+            .addTo(disposables)
     }
     
     /**
@@ -126,6 +146,7 @@ class AppointmentDetailFragment : Fragment() {
     }
     
     override fun onDestroyView() {
+        disposables.clear()
         super.onDestroyView()
         _binding = null
     }

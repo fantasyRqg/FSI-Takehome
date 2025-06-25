@@ -3,6 +3,7 @@ package com.example.hairsalonappointments.adapters
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.hairsalonappointments.R
 import com.example.hairsalonappointments.data.Appointment
 import com.example.hairsalonappointments.databinding.ItemAppointmentBinding
 import java.text.SimpleDateFormat
@@ -30,8 +31,7 @@ class AppointmentAdapter(
     private val timeFormatter = SimpleDateFormat("h:mm a", Locale.getDefault())
     
     /**
-     * TODO: Implement this function
-     * 
+     *
      * Create and return a ViewHolder.
      * - Inflate the item_appointment layout using view binding
      * - Return a new AppointmentViewHolder instance
@@ -41,15 +41,13 @@ class AppointmentAdapter(
      * @return A new ViewHolder that holds a View for an appointment item
      */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AppointmentViewHolder {
-        // TODO: Implement view holder creation
         // Hint: Use ItemAppointmentBinding.inflate(...)
-        
-        throw NotImplementedError("Candidate needs to implement onCreateViewHolder()")
+        val binding = ItemAppointmentBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return AppointmentViewHolder(binding)
     }
     
     /**
-     * TODO: Implement this function
-     * 
+     *
      * Bind appointment data to the views.
      * - Display client name
      * - Display service type (use displayName from ServiceType)
@@ -62,12 +60,11 @@ class AppointmentAdapter(
      * @param position The position of the item within the adapter's data set
      */
     override fun onBindViewHolder(holder: AppointmentViewHolder, position: Int) {
-        // TODO: Implement data binding
         // Get the appointment at this position
         // Bind all the data to the views
         // Set click listener
-        
-        throw NotImplementedError("Candidate needs to implement onBindViewHolder()")
+
+        holder.bind(appointments[position], onAppointmentClick)
     }
     
     override fun getItemCount(): Int = appointments.size
@@ -100,6 +97,12 @@ class AppointmentAdapter(
         fun bind(appointment: Appointment, onClickListener: (Appointment) -> Unit) {
             // This method can be used in onBindViewHolder
             // to keep the binding logic organized
+            binding.root.setOnClickListener { onClickListener(appointment) }
+            binding.textViewStatus.text = appointment.status.name
+            binding.textViewClientName.text = appointment.clientName
+            binding.textViewTime.text = timeFormatter.format(appointment.appointmentTime)
+            binding.textViewService.text = binding.root.context.getString(R.string.stylist_format, appointment.serviceType.displayName)
+            binding.textViewStylist.text = appointment.stylistName
         }
     }
 }
