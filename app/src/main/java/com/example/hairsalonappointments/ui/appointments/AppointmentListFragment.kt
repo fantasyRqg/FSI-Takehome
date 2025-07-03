@@ -87,6 +87,7 @@ class AppointmentListFragment : Fragment() {
                     showingAllAppointments = true
                     updateAppointmentList()
                 }
+
                 R.id.chipAvailable -> {
                     showingAllAppointments = false
                     updateAppointmentList()
@@ -96,7 +97,8 @@ class AppointmentListFragment : Fragment() {
     }
 
     private fun setupSearch() {
-        binding.searchView.setOnQueryTextListener(object : androidx.appcompat.widget.SearchView.OnQueryTextListener {
+        binding.searchView.setOnQueryTextListener(object :
+            androidx.appcompat.widget.SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 return false
             }
@@ -138,7 +140,11 @@ class AppointmentListFragment : Fragment() {
                 },
                 onError = {
                     Log.e(TAG, "loadAppointments: $it", it)
-                    Toast.makeText(requireContext(), "Error loading appointments. Err: $it", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        "Error loading appointments. Err: $it",
+                        Toast.LENGTH_SHORT
+                    ).show()
                     updateEmptyState(true)
                 }
             )
@@ -157,9 +163,11 @@ class AppointmentListFragment : Fragment() {
     private fun onAppointmentClick(appointment: Appointment) {
         // Use findNavController() and navigate with appointment ID
 
-        findNavController().navigate(R.id.action_appointmentListFragment_to_appointmentDetailFragment, Bundle().apply {
-            putInt("appointmentId", appointment.id)
-        })
+        findNavController().navigate(
+            R.id.action_appointmentListFragment_to_appointmentDetailFragment,
+            Bundle().apply {
+                putInt("appointmentId", appointment.id)
+            })
 //        AppointmentListFragmentDirections.actionAppointmentListFragmentToAppointmentDetailFragment(appointment.id)
     }
 
@@ -228,12 +236,18 @@ class AppointmentListFragment : Fragment() {
             findNavController().navigate(R.id.action_appointmentListFragment_to_stylistPerformanceFragment)
             hideFabMenu()
         }
+
+        binding.fabTopServiceDashboard.setOnClickListener {
+            findNavController().navigate(R.id.action_appointmentListFragment_to_serviceStatsFragment)
+            hideFabMenu()
+        }
     }
 
     private fun showFabMenu() {
         isFabMenuOpen = true
         binding.fabAvailableSlots.visibility = View.VISIBLE
         binding.fabPerformanceMetrics.visibility = View.VISIBLE
+        binding.fabTopServiceDashboard.visibility = View.VISIBLE
         binding.fabMenu.setImageResource(R.drawable.ic_close) // Change icon to close
     }
 
@@ -241,6 +255,7 @@ class AppointmentListFragment : Fragment() {
         isFabMenuOpen = false
         binding.fabAvailableSlots.visibility = View.GONE
         binding.fabPerformanceMetrics.visibility = View.GONE
+        binding.fabTopServiceDashboard.visibility = View.GONE
         binding.fabMenu.setImageResource(R.drawable.ic_add) // Change icon back to add
     }
 

@@ -30,13 +30,13 @@
 
     <dialog
         android:id="@+id/availableSlotsFragment"
-        android:name="com.example.hairsalonappointments.ui.appointments.AvailableSlotsFragment"
+        android:name="com.example.hairsalonappointments.ui.availableslots.AvailableSlotsFragment"
         android:label="Available Slots"
         tools:layout="@layout/fragment_available_slots" />
 
     <fragment
         android:id="@+id/stylistPerformanceFragment"
-        android:name="com.example.hairsalonappointments.ui.appointments.StylistPerformanceFragment"
+        android:name="com.example.hairsalonappointments.ui.performance.StylistPerformanceFragment"
         android:label="Stylist Performance"
         tools:layout="@layout/fragment_stylist_performance">
     </fragment>
@@ -47,6 +47,16 @@
 
     <action
         android:id="@+id/action_appointmentListFragment_to_stylistPerformanceFragment"
-        app:destination="@id/stylistPerformanceFragment" />
+        app:destination="@+id/stylistPerformanceFragment" />
+
+    <fragment
+        android:id="@+id/serviceStatsFragment"
+        android:name="com.example.hairsalonappointments.ui.servicestats.ServiceStatsFragment"
+        android:label="Service Statistics"
+        tools:layout="@layout/fragment_service_stats" />
+
+    <action
+        android:id="@+id/action_appointmentListFragment_to_serviceStatsFragment"
+        app:destination="@+id/serviceStatsFragment" />
 
 </navigation>

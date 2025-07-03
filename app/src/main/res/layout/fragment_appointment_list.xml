@@ -73,14 +73,25 @@
         tools:listitem="@layout/item_appointment" />
 
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:id="@+id/fabMenuLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
+        android:orientation="vertical"
+        android:gravity="end"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabTopServiceDashboard"
+            style="@style/float_menu"
+            android:layout_marginBottom="16dp"
+            android:contentDescription="@string/top_services_dashboard"
+            android:visibility="gone"
+            app:fabSize="mini"
+            app:srcCompat="@drawable/ic_dashboard" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fabPerformanceMetrics"
@@ -89,8 +100,6 @@
             android:contentDescription="@string/performance_metrics"
             android:visibility="gone"
             app:fabSize="mini"
-            app:layout_constraintBottom_toTopOf="@+id/fabAvailableSlots"
-            app:layout_constraintEnd_toEndOf="parent"
             app:srcCompat="@drawable/ic_analytics" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -100,8 +109,6 @@
             android:contentDescription="@string/show_available_slots"
             android:visibility="gone"
             app:fabSize="mini"
-            app:layout_constraintBottom_toTopOf="@+id/fabMenu"
-            app:layout_constraintEnd_toEndOf="parent"
             app:srcCompat="@drawable/ic_calendar" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -110,11 +117,9 @@
             android:clickable="true"
             android:contentDescription="@string/menu"
             android:focusable="true"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
             app:srcCompat="@drawable/ic_add" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 
     <TextView
         android:id="@+id/textViewEmpty"

@@ -1,4 +1,4 @@
-package com.example.hairsalonappointments.ui.appointments
+package com.example.hairsalonappointments.ui.performance
 
 import android.os.Bundle
 import android.util.Log
@@ -10,7 +10,6 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.hairsalonappointments.adapters.StylistStatsAdapter
 import com.example.hairsalonappointments.data.MockApiService
-import com.example.hairsalonappointments.data.StylistStats
 import com.example.hairsalonappointments.data.StylistSummaryStats
 import com.example.hairsalonappointments.databinding.FragmentStylistPerformanceBinding
 import com.example.hairsalonappointments.adapters.StylistPerformanceItem

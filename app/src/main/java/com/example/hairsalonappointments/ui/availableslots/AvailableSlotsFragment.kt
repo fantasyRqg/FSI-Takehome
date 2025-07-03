@@ -1,4 +1,4 @@
-package com.example.hairsalonappointments.ui.appointments
+package com.example.hairsalonappointments.ui.availableslots
 
 import android.os.Bundle
 import android.util.Log
