@@ -24,10 +24,10 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 
 /**
  * Fragment for displaying the list of appointments
- * 
+ *
  * TASK FOR CANDIDATE:
  * Implement the core functionality for this fragment.
- * 
+ *
  * Requirements:
  * - Load appointments from MockApiService
  * - Display them in a RecyclerView
@@ -43,7 +43,7 @@ class AppointmentListFragment : Fragment() {
 
     private var _binding: FragmentAppointmentListBinding? = null
     private val binding get() = _binding!!
-    
+
     private lateinit var adapter: AppointmentAdapter
     private val apiService by lazy { MockApiService() }
     private var allAppointments = emptyList<Appointment>()
@@ -58,27 +58,28 @@ class AppointmentListFragment : Fragment() {
         _binding = FragmentAppointmentListBinding.inflate(inflater, container, false)
         return binding.root
     }
-    
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        
+
         setupRecyclerView()
         setupFilterToggle()
         setupSearch()
         loadAppointments()
+        setupFab()
     }
-    
+
     private fun setupRecyclerView() {
         adapter = AppointmentAdapter { appointment ->
             onAppointmentClick(appointment)
         }
-        
+
         binding.recyclerViewAppointments.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = this@AppointmentListFragment.adapter
         }
     }
-    
+
     private fun setupFilterToggle() {
         binding.chipGroupFilter.setOnCheckedStateChangeListener { _, checkedIds ->
             when (checkedIds.firstOrNull()) {
@@ -93,7 +94,7 @@ class AppointmentListFragment : Fragment() {
             }
         }
     }
-    
+
     private fun setupSearch() {
         binding.searchView.setOnQueryTextListener(object : androidx.appcompat.widget.SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
@@ -108,7 +109,7 @@ class AppointmentListFragment : Fragment() {
         })
     }
 
-    
+
     /**
      *
      * Load appointments from the MockApiService.
@@ -150,7 +151,7 @@ class AppointmentListFragment : Fragment() {
      * - Navigate to AppointmentDetailFragment
      * - Pass the appointment ID as an argument
      * - Use Navigation component
-     * 
+     *
      * @param appointment The clicked appointment
      */
     private fun onAppointmentClick(appointment: Appointment) {
@@ -161,7 +162,7 @@ class AppointmentListFragment : Fragment() {
         })
 //        AppointmentListFragmentDirections.actionAppointmentListFragmentToAppointmentDetailFragment(appointment.id)
     }
-    
+
     /**
      * Update the displayed appointment list based on current filter
      */
@@ -174,29 +175,29 @@ class AppointmentListFragment : Fragment() {
                 it.status == AppointmentStatus.PENDING ||
                         it.status == AppointmentStatus.CONFIRMED
             }
-        }.filter { 
+        }.filter {
             if (searchQuery.isEmpty()) {
                 true
             } else {
                 it.clientName.contains(searchQuery, ignoreCase = true) ||
                         it.stylistName.contains(searchQuery, ignoreCase = true)
             }
-        
+
         }
-        
+
         adapter.submitList(appointmentsToShow)
         updateEmptyState(appointmentsToShow.isEmpty())
     }
-    
+
     /**
      * Update the empty state visibility
-     * 
+     *
      * @param isEmpty Whether the list is empty
      */
     private fun updateEmptyState(isEmpty: Boolean) {
         binding.textViewEmpty.visibility = if (isEmpty) View.VISIBLE else View.GONE
         binding.recyclerViewAppointments.visibility = if (isEmpty) View.GONE else View.VISIBLE
-        
+
         if (isEmpty) {
             binding.textViewEmpty.text = when {
                 searchQuery.isNotEmpty() -> "No appointments found for \"$searchQuery\""
@@ -205,7 +206,14 @@ class AppointmentListFragment : Fragment() {
             }
         }
     }
-    
+
+
+    private fun setupFab() {
+        binding.fabShowAvailableSlots.setOnClickListener {
+            findNavController().navigate(R.id.action_appointmentListFragment_to_availableSlotsFragment)
+        }
+    }
+
     override fun onDestroyView() {
         disposables.clear()
         super.onDestroyView()

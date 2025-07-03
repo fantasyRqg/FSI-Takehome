@@ -13,6 +13,9 @@
         <action
             android:id="@+id/action_appointmentListFragment_to_appointmentDetailFragment"
             app:destination="@id/appointmentDetailFragment" />
+        <action
+            android:id="@+id/action_appointmentListFragment_to_availableSlotsFragment"
+            app:destination="@id/availableSlotsFragment" />
     </fragment>
 
     <fragment
@@ -24,5 +27,15 @@
             android:name="appointmentId"
             app:argType="integer" />
     </fragment>
+
+    <dialog
+        android:id="@+id/availableSlotsFragment"
+        android:name="com.example.hairsalonappointments.ui.appointments.AvailableSlotsFragment"
+        android:label="Available Slots"
+        tools:layout="@layout/fragment_available_slots" />
+
+    <action
+        android:id="@+id/action_appointmentListFragment_to_availableSlotsFragment"
+        app:destination="@id/availableSlotsFragment" />
 
 </navigation>

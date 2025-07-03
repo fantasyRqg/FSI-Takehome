@@ -33,4 +33,7 @@
     <string name="all">All</string>
     <string name="available">Available</string>
     <string name="no_appointments_scheduled_for_today">No appointments scheduled for today</string>
+    <string name="available_slots">Available Slots</string>
+    <string name="book_slot">Book Slot</string>
+    <string name="show_available_slots">Show Available Slots</string>
 </resources>
