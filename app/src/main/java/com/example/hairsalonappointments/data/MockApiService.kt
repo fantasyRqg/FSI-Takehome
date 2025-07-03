@@ -6,12 +6,12 @@ import kotlin.random.Random
 
 /**
  * Mock API Service for the Hair Salon Appointment App
- * 
+ *
  * This service provides mock data for the application.
  * In a real application, this would make network requests to a backend API.
  */
 class MockApiService {
-    
+
     private val appointments = listOf(
         Appointment(
             id = 1,
@@ -94,10 +94,10 @@ class MockApiService {
             notes = "Dry, damaged hair - recommended deep conditioning treatment"
         )
     )
-    
+
     /**
      * Returns a list of today's appointments.
-     * 
+     *
      * @return List of appointments for today
      */
     fun getTodaysAppointments(): List<Appointment> {
@@ -105,10 +105,10 @@ class MockApiService {
         Thread.sleep(300)
         return appointments
     }
-    
+
     /**
      * Returns a specific appointment by ID.
-     * 
+     *
      * @param id The appointment ID to search for
      * @return The appointment if found, null otherwise
      */
@@ -117,17 +117,17 @@ class MockApiService {
         Thread.sleep(200)
         return appointments.find { it.id == id }
     }
-    
+
     /**
      * Returns available time slots for booking.
      * This would typically check against existing appointments to find open slots.
-     * 
+     *
      * @return List of available time slots as strings
      */
     fun getAvailableSlots(): List<String> {
         // Simulate a small delay that would occur with a real API call
         Thread.sleep(250)
-        
+
         // Generate all possible time slots (9 AM - 6 PM, 30-minute intervals)
         val allSlots = mutableListOf<String>()
         for (hour in 9..17) {
@@ -136,7 +136,7 @@ class MockApiService {
                 allSlots.add(String.format("%d:30 %s", if (hour > 12) hour - 12 else hour, if (hour >= 12) "PM" else "AM"))
             }
         }
-        
+
         // Remove slots that have appointments
         val bookedTimes = appointments.map { appointment ->
             val calendar = Calendar.getInstance()
@@ -146,21 +146,21 @@ class MockApiService {
             val amPm = if (calendar.get(Calendar.AM_PM) == Calendar.AM) "AM" else "PM"
             String.format("%d:%02d %s", if (hour == 0) 12 else hour, minute, amPm)
         }.toSet()
-        
+
         return allSlots.filter { it !in bookedTimes }
     }
-    
+
     /**
      * Get statistics for each stylist
      */
     fun getStylistStats(): List<StylistStats> {
         Thread.sleep(300)
-        
+
         val stylistGroups = appointments.groupBy { it.stylistName }
         return stylistGroups.map { (stylistName, appointments) ->
             val totalRevenue = appointments.sumOf { it.serviceType.price }
             val services = appointments.map { it.serviceType }.distinct()
-            
+
             StylistStats(
                 stylistName = stylistName,
                 appointmentCount = appointments.size,
@@ -170,13 +170,13 @@ class MockApiService {
             )
         }
     }
-    
+
     /**
      * Get statistics for each service type
      */
     fun getServiceStats(): List<ServiceStats> {
         Thread.sleep(250)
-        
+
         val serviceGroups = appointments.groupBy { it.serviceType }
         return serviceGroups.map { (serviceType, appointments) ->
             ServiceStats(
@@ -188,19 +188,19 @@ class MockApiService {
             )
         }.sortedByDescending { it.bookingCount }
     }
-    
+
     /**
      * Get daily revenue breakdown
      */
     fun getDailyRevenue(): DailyRevenue {
         Thread.sleep(200)
-        
+
         val totalRevenue = appointments.sumOf { it.serviceType.price }
         val revenueByService = appointments.groupBy { it.serviceType }
             .mapValues { (_, appointments) -> appointments.sumOf { it.serviceType.price } }
         val revenueByStylist = appointments.groupBy { it.stylistName }
             .mapValues { (_, appointments) -> appointments.sumOf { it.serviceType.price } }
-        
+
         return DailyRevenue(
             date = "Today",
             totalRevenue = totalRevenue,
@@ -209,19 +209,19 @@ class MockApiService {
             appointmentCount = appointments.size
         )
     }
-    
+
     /**
      * Get client appointment history
      */
     fun getClientHistory(clientPhone: String): List<Appointment> {
         Thread.sleep(300)
-        
+
         // For demo purposes, return past appointments for the client
         val clientAppointments = appointments.filter { it.clientPhone == clientPhone }
-        
+
         // Create some historical appointments
         val historicalAppointments = clientAppointments.flatMap { appointment ->
-            listOf(
+            val ol = listOf(
                 appointment.copy(
                     id = appointment.id + 100,
                     appointmentTime = createAppointmentTime(-30, 10, 0), // 30 days ago
@@ -233,22 +233,34 @@ class MockApiService {
                     status = AppointmentStatus.COMPLETED
                 )
             )
+            val rl = mutableListOf(
+                appointment.copy(
+                    id = appointment.id + 100,
+                    appointmentTime = createAppointmentTime(-30, 10, 0), // 30 days ago
+                    status = AppointmentStatus.COMPLETED
+                )
+            )
+            repeat(10) {
+                rl.addAll(ol)
+            }
+
+            rl
         }
-        
+
         return historicalAppointments.sortedByDescending { it.appointmentTime }
     }
-    
+
     /**
      * Update appointment status
      */
     fun updateAppointmentStatus(appointmentId: Int, newStatus: AppointmentStatus): Boolean {
         Thread.sleep(200)
-        
+
         // In a real app, this would update the database
         // For demo, just return success if appointment exists
         return appointments.any { it.id == appointmentId }
     }
-    
+
     /**
      * Book a new appointment slot
      */
@@ -260,7 +272,7 @@ class MockApiService {
         serviceType: ServiceType
     ): Appointment? {
         Thread.sleep(400)
-        
+
         // Parse the time slot
         val timeParts = timeSlot.split(" ")
         val time = timeParts[0].split(":")
@@ -268,9 +280,9 @@ class MockApiService {
         val minute = time[1].toInt()
         if (timeParts[1] == "PM" && hour != 12) hour += 12
         if (timeParts[1] == "AM" && hour == 12) hour = 0
-        
+
         val newId = appointments.maxOf { it.id } + 1
-        
+
         return Appointment(
             id = newId,
             clientName = clientName,
@@ -282,13 +294,13 @@ class MockApiService {
             notes = "New booking via app"
         )
     }
-    
+
     /**
      * Get all stylists
      */
     fun getStylists(): List<Stylist> {
         Thread.sleep(250)
-        
+
         return listOf(
             Stylist(
                 id = 1,
@@ -324,7 +336,7 @@ class MockApiService {
             )
         )
     }
-    
+
     /**
      * Get all available service types
      */
@@ -332,7 +344,7 @@ class MockApiService {
         Thread.sleep(150)
         return ServiceType.values().toList()
     }
-    
+
     /**
      * Helper function to create appointment times for today
      */
@@ -344,7 +356,7 @@ class MockApiService {
         calendar.set(Calendar.MILLISECOND, 0)
         return calendar.time
     }
-    
+
     /**
      * Helper function to create appointment times for past dates
      */

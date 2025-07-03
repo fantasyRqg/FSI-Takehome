@@ -2,9 +2,8 @@
     <string name="app_name">Hair Salon Appointments</string>
     
     <!-- Fragment Labels -->
-    <string name="appointments_title">Today\'s Appointments</string>
     <string name="appointment_details_title">Appointment Details</string>
-    
+    <string name="appointments_title">Today\'s Appointments</string>
     <!-- Filter Options -->
     <string name="filter_all">All</string>
     <string name="filter_available">Available</string>
@@ -46,4 +45,8 @@
     <string name="loading">Loading...</string>
     <string name="revenue_by_service_type">Revenue by Service Type</string>
     <string name="daily_revenue_by_stylist">Revenue by Stylist</string>
+    <string name="previous_visits">Previous Visits</string>
+    <string name="error_loading_previous_visits">Error loading previous visits: %1$s</string>
+    <string name="service_duration_minutes">%1$d minutes</string>
+    <string name="no_previous_visits_found_for_this_client">No previous visits found for this client.</string>
 </resources>
