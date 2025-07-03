@@ -36,4 +36,6 @@
     <string name="available_slots">Available Slots</string>
     <string name="book_slot">Book Slot</string>
     <string name="show_available_slots">Show Available Slots</string>
+    <string name="performance_metrics">Performance Metrics</string>
+    <string name="menu">Menu</string>
 </resources>

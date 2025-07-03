@@ -34,8 +34,19 @@
         android:label="Available Slots"
         tools:layout="@layout/fragment_available_slots" />
 
+    <fragment
+        android:id="@+id/stylistPerformanceFragment"
+        android:name="com.example.hairsalonappointments.ui.appointments.StylistPerformanceFragment"
+        android:label="Stylist Performance"
+        tools:layout="@layout/fragment_stylist_performance">
+    </fragment>
+
     <action
         android:id="@+id/action_appointmentListFragment_to_availableSlotsFragment"
         app:destination="@id/availableSlotsFragment" />
+
+    <action
+        android:id="@+id/action_appointmentListFragment_to_stylistPerformanceFragment"
+        app:destination="@id/stylistPerformanceFragment" />
 
 </navigation>

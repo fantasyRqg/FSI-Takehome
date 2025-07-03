@@ -208,10 +208,40 @@ class AppointmentListFragment : Fragment() {
     }
 
 
+    private var isFabMenuOpen = false
+
     private fun setupFab() {
-        binding.fabShowAvailableSlots.setOnClickListener {
-            findNavController().navigate(R.id.action_appointmentListFragment_to_availableSlotsFragment)
+        binding.fabMenu.setOnClickListener {
+            if (isFabMenuOpen) {
+                hideFabMenu()
+            } else {
+                showFabMenu()
+            }
         }
+
+        binding.fabAvailableSlots.setOnClickListener {
+            findNavController().navigate(R.id.action_appointmentListFragment_to_availableSlotsFragment)
+            hideFabMenu()
+        }
+
+        binding.fabPerformanceMetrics.setOnClickListener {
+            findNavController().navigate(R.id.action_appointmentListFragment_to_stylistPerformanceFragment)
+            hideFabMenu()
+        }
+    }
+
+    private fun showFabMenu() {
+        isFabMenuOpen = true
+        binding.fabAvailableSlots.visibility = View.VISIBLE
+        binding.fabPerformanceMetrics.visibility = View.VISIBLE
+        binding.fabMenu.setImageResource(R.drawable.ic_close) // Change icon to close
+    }
+
+    private fun hideFabMenu() {
+        isFabMenuOpen = false
+        binding.fabAvailableSlots.visibility = View.GONE
+        binding.fabPerformanceMetrics.visibility = View.GONE
+        binding.fabMenu.setImageResource(R.drawable.ic_add) // Change icon back to add
     }
 
     override fun onDestroyView() {

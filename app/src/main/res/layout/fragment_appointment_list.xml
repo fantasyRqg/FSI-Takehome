@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".ui.appointments.AppointmentListFragment">
 
+
     <TextView
         android:id="@+id/textViewTitle"
         android:layout_width="wrap_content"
@@ -37,24 +38,24 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        app:singleSelection="true"
-        app:checkedChip="@id/chipAll"
+        app:checkedChip="@+id/chipAll"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/searchView">
+        app:layout_constraintTop_toBottomOf="@+id/searchView"
+        app:singleSelection="true">
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chipAll"
+            style="@style/Widget.Material3.Chip.Filter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/all"
-            style="@style/Widget.Material3.Chip.Filter" />
+            android:text="@string/all" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chipAvailable"
+            style="@style/Widget.Material3.Chip.Filter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/available"
-            style="@style/Widget.Material3.Chip.Filter" />
+            android:text="@string/available" />
 
     </com.google.android.material.chip.ChipGroup>
 
@@ -68,20 +69,52 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/chipGroupFilter"
+        app:layout_constraintTop_toBottomOf="@+id/chipGroupFilter"
         tools:listitem="@layout/item_appointment" />
 
-    
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabShowAvailableSlots"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/fabMenuLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:contentDescription="@string/show_available_slots"
-        app:srcCompat="@android:drawable/ic_menu_my_calendar"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabPerformanceMetrics"
+            style="@style/float_menu"
+            android:layout_marginBottom="16dp"
+            android:contentDescription="@string/performance_metrics"
+            android:visibility="gone"
+            app:fabSize="mini"
+            app:layout_constraintBottom_toTopOf="@+id/fabAvailableSlots"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:srcCompat="@drawable/ic_analytics" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabAvailableSlots"
+            style="@style/float_menu"
+            android:layout_marginBottom="16dp"
+            android:contentDescription="@string/show_available_slots"
+            android:visibility="gone"
+            app:fabSize="mini"
+            app:layout_constraintBottom_toTopOf="@+id/fabMenu"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:srcCompat="@drawable/ic_calendar" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabMenu"
+            style="@style/float_menu"
+            android:clickable="true"
+            android:contentDescription="@string/menu"
+            android:focusable="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:srcCompat="@drawable/ic_add" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
         android:id="@+id/textViewEmpty"
