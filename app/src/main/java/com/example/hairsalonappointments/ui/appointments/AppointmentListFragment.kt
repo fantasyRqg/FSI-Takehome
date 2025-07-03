@@ -48,6 +48,7 @@ class AppointmentListFragment : Fragment() {
     private val apiService by lazy { MockApiService() }
     private var allAppointments = emptyList<Appointment>()
     private var showingAllAppointments = true
+    private var searchQuery = ""
     private val disposables = CompositeDisposable()
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -63,6 +64,7 @@ class AppointmentListFragment : Fragment() {
         
         setupRecyclerView()
         setupFilterToggle()
+        setupSearch()
         loadAppointments()
     }
     
@@ -91,6 +93,21 @@ class AppointmentListFragment : Fragment() {
             }
         }
     }
+    
+    private fun setupSearch() {
+        binding.searchView.setOnQueryTextListener(object : androidx.appcompat.widget.SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                searchQuery = newText.orEmpty()
+                updateAppointmentList()
+                return true
+            }
+        })
+    }
+
     
     /**
      *
@@ -157,6 +174,14 @@ class AppointmentListFragment : Fragment() {
                 it.status == AppointmentStatus.PENDING ||
                         it.status == AppointmentStatus.CONFIRMED
             }
+        }.filter { 
+            if (searchQuery.isEmpty()) {
+                true
+            } else {
+                it.clientName.contains(searchQuery, ignoreCase = true) ||
+                        it.stylistName.contains(searchQuery, ignoreCase = true)
+            }
+        
         }
         
         adapter.submitList(appointmentsToShow)
@@ -173,10 +198,10 @@ class AppointmentListFragment : Fragment() {
         binding.recyclerViewAppointments.visibility = if (isEmpty) View.GONE else View.VISIBLE
         
         if (isEmpty) {
-            binding.textViewEmpty.text = if (showingAllAppointments) {
-                "No appointments scheduled for today"
-            } else {
-                "No available appointments"
+            binding.textViewEmpty.text = when {
+                searchQuery.isNotEmpty() -> "No appointments found for \"$searchQuery\""
+                showingAllAppointments -> "No appointments scheduled for today"
+                else -> "No available appointments"
             }
         }
     }

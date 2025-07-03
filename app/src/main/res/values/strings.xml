@@ -29,4 +29,8 @@
     <string name="stylist_format">with %s</string>
     <string name="duration_format">Duration: %d minutes</string>
     <string name="price_format">$%.2f</string>
+    <string name="today_s_appointments">Today\'s Appointments</string>
+    <string name="all">All</string>
+    <string name="available">Available</string>
+    <string name="no_appointments_scheduled_for_today">No appointments scheduled for today</string>
 </resources>

@@ -12,11 +12,24 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:text="Today's Appointments"
+        android:text="@string/today_s_appointments"
         android:textAppearance="@style/TextAppearance.Material3.HeadlineMedium"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/searchView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        app:iconifiedByDefault="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewTitle"
+        app:queryHint="Search by client or stylist name" />
 
     <com.google.android.material.chip.ChipGroup
         android:id="@+id/chipGroupFilter"
@@ -27,20 +40,20 @@
         app:singleSelection="true"
         app:checkedChip="@id/chipAll"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textViewTitle">
+        app:layout_constraintTop_toBottomOf="@id/searchView">
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chipAll"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="All"
+            android:text="@string/all"
             style="@style/Widget.Material3.Chip.Filter" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chipAvailable"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Available"
+            android:text="@string/available"
             style="@style/Widget.Material3.Chip.Filter" />
 
     </com.google.android.material.chip.ChipGroup>
@@ -62,7 +75,7 @@
         android:id="@+id/textViewEmpty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="No appointments scheduled for today"
+        android:text="@string/no_appointments_scheduled_for_today"
         android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
