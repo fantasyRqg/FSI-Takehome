@@ -39,4 +39,11 @@
     <string name="performance_metrics">Performance Metrics</string>
     <string name="menu">Menu</string>
     <string name="top_services_dashboard">Top Services Dashboard</string>
+    <string name="daily_revenue_summary">Daily Revenue Summary</string>
+    <string name="total_revenue_2f">$%.2f</string>
+    <string name="appointment_count">Appointment Count: %1$d</string>
+    <string name="error_loading_daily_revenue">Error loading daily revenue: %1$s</string>
+    <string name="loading">Loading...</string>
+    <string name="revenue_by_service_type">Revenue by Service Type</string>
+    <string name="daily_revenue_by_stylist">Revenue by Stylist</string>
 </resources>

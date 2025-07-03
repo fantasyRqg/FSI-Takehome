@@ -59,4 +59,14 @@
         android:id="@+id/action_appointmentListFragment_to_serviceStatsFragment"
         app:destination="@+id/serviceStatsFragment" />
 
+    <fragment
+        android:id="@+id/dailyRevenueFragment"
+        android:name="com.example.hairsalonappointments.ui.dailyrevenue.DailyRevenueFragment"
+        android:label="Daily Revenue Summary"
+        tools:layout="@layout/fragment_daily_revenue" />
+
+    <action
+        android:id="@+id/action_appointmentListFragment_to_dailyRevenueFragment"
+        app:destination="@+id/dailyRevenueFragment" />
+
 </navigation>

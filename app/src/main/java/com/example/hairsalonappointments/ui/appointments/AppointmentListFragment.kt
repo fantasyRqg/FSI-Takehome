@@ -241,10 +241,16 @@ class AppointmentListFragment : Fragment() {
             findNavController().navigate(R.id.action_appointmentListFragment_to_serviceStatsFragment)
             hideFabMenu()
         }
+
+        binding.fabDailyRevenueSummary.setOnClickListener {
+            findNavController().navigate(R.id.action_appointmentListFragment_to_dailyRevenueFragment)
+            hideFabMenu()
+        }
     }
 
     private fun showFabMenu() {
         isFabMenuOpen = true
+        binding.fabDailyRevenueSummary.visibility = View.VISIBLE
         binding.fabAvailableSlots.visibility = View.VISIBLE
         binding.fabPerformanceMetrics.visibility = View.VISIBLE
         binding.fabTopServiceDashboard.visibility = View.VISIBLE
@@ -253,6 +259,7 @@ class AppointmentListFragment : Fragment() {
 
     private fun hideFabMenu() {
         isFabMenuOpen = false
+        binding.fabDailyRevenueSummary.visibility = View.GONE
         binding.fabAvailableSlots.visibility = View.GONE
         binding.fabPerformanceMetrics.visibility = View.GONE
         binding.fabTopServiceDashboard.visibility = View.GONE
