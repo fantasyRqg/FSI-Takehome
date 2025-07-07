@@ -7,6 +7,8 @@ import com.example.hairsalonappointments.R
 import com.example.hairsalonappointments.data.Appointment
 import com.example.hairsalonappointments.databinding.ItemAppointmentBinding
 import java.text.SimpleDateFormat
+import android.view.View
+import com.example.hairsalonappointments.data.AppointmentStatus
 import java.util.Locale
 
 /**
@@ -24,8 +26,15 @@ import java.util.Locale
  * - Use view binding (already set up in gradle)
  */
 class AppointmentAdapter(
-    private val onAppointmentClick: (Appointment) -> Unit
+    private val onAppointmentClick: (Appointment) -> Unit,
+    private val onAppointmentActionListener: OnAppointmentActionListener
 ) : RecyclerView.Adapter<AppointmentAdapter.AppointmentViewHolder>() {
+
+    interface OnAppointmentActionListener {
+        fun onConfirmClick(appointment: Appointment)
+        fun onCancelClick(appointment: Appointment)
+        fun onCompleteClick(appointment: Appointment)
+    }
     
     private var appointments = emptyList<Appointment>()
     private val timeFormatter = SimpleDateFormat("h:mm a", Locale.getDefault())
@@ -95,14 +104,36 @@ class AppointmentAdapter(
          * @param onClickListener The click listener for this item
          */
         fun bind(appointment: Appointment, onClickListener: (Appointment) -> Unit) {
-            // This method can be used in onBindViewHolder
-            // to keep the binding logic organized
             binding.root.setOnClickListener { onClickListener(appointment) }
             binding.textViewStatus.text = appointment.status.name
             binding.textViewClientName.text = appointment.clientName
             binding.textViewTime.text = timeFormatter.format(appointment.appointmentTime)
             binding.textViewService.text = binding.root.context.getString(R.string.stylist_format, appointment.serviceType.displayName)
             binding.textViewStylist.text = appointment.stylistName
+
+            // Set up button click listeners
+            binding.buttonConfirm.setOnClickListener { onAppointmentActionListener.onConfirmClick(appointment) }
+            binding.buttonCancel.setOnClickListener { onAppointmentActionListener.onCancelClick(appointment) }
+            binding.buttonComplete.setOnClickListener { onAppointmentActionListener.onCompleteClick(appointment) }
+
+            // Show/hide buttons based on appointment status
+            when (appointment.status) {
+                AppointmentStatus.PENDING -> {
+                    binding.buttonConfirm.visibility = View.VISIBLE
+                    binding.buttonCancel.visibility = View.VISIBLE
+                    binding.buttonComplete.visibility = View.GONE
+                }
+                AppointmentStatus.CONFIRMED -> {
+                    binding.buttonConfirm.visibility = View.GONE
+                    binding.buttonCancel.visibility = View.VISIBLE
+                    binding.buttonComplete.visibility = View.VISIBLE
+                }
+                else -> { // COMPLETED, CANCELLED
+                    binding.buttonConfirm.visibility = View.GONE
+                    binding.buttonCancel.visibility = View.GONE
+                    binding.buttonComplete.visibility = View.GONE
+                }
+            }
         }
     }
 }

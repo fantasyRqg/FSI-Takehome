@@ -36,7 +36,9 @@ import io.reactivex.rxjava3.schedulers.Schedulers
  * - Navigate to detail screen on item click
  * - Handle loading and error states appropriately
  */
-class AppointmentListFragment : Fragment() {
+import android.app.AlertDialog
+
+class AppointmentListFragment : Fragment(), AppointmentAdapter.OnAppointmentActionListener {
     companion object {
         private val TAG = AppointmentListFragment::class.simpleName
     }
@@ -70,9 +72,10 @@ class AppointmentListFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        adapter = AppointmentAdapter { appointment ->
-            onAppointmentClick(appointment)
-        }
+        adapter = AppointmentAdapter(
+            onAppointmentClick = { appointment -> onAppointmentClick(appointment) },
+            onAppointmentActionListener = this
+        )
 
         binding.recyclerViewAppointments.apply {
             layoutManager = LinearLayoutManager(requireContext())
@@ -264,6 +267,52 @@ class AppointmentListFragment : Fragment() {
         binding.fabPerformanceMetrics.visibility = View.GONE
         binding.fabTopServiceDashboard.visibility = View.GONE
         binding.fabMenu.setImageResource(R.drawable.ic_add) // Change icon back to add
+    }
+
+    override fun onConfirmClick(appointment: Appointment) {
+        showConfirmationDialog(appointment, AppointmentStatus.CONFIRMED, "Confirm")
+    }
+
+    override fun onCancelClick(appointment: Appointment) {
+        showConfirmationDialog(appointment, AppointmentStatus.CANCELLED, "Cancel")
+    }
+
+    override fun onCompleteClick(appointment: Appointment) {
+        showConfirmationDialog(appointment, AppointmentStatus.COMPLETED, "Complete")
+    }
+
+    private fun showConfirmationDialog(appointment: Appointment, newStatus: AppointmentStatus, action: String) {
+        AlertDialog.Builder(requireContext())
+            .setTitle("$action Appointment")
+            .setMessage("Are you sure you want to $action ${appointment.clientName}'s appointment?")
+            .setPositiveButton("Yes") { _, _ ->
+                updateAppointmentStatus(appointment.id, newStatus)
+            }
+            .setNegativeButton("No", null)
+            .show()
+    }
+
+    private fun updateAppointmentStatus(appointmentId: Int, newStatus: AppointmentStatus) {
+        Observable.fromCallable {
+            apiService.updateAppointmentStatus(appointmentId, newStatus) ?: throw Exception("Failed to update appointment status.")
+        }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onNext = { updatedAppointment: Appointment? ->
+                    updatedAppointment?.let {
+                        Toast.makeText(requireContext(), "Appointment status updated to ${it.status.name}", Toast.LENGTH_SHORT).show()
+                        loadAppointments() // Refresh the list
+                    } ?: run {
+                        Toast.makeText(requireContext(), "Failed to update appointment status.", Toast.LENGTH_SHORT).show()
+                    }
+                },
+                onError = {
+                    Log.e(TAG, "updateAppointmentStatus: $it", it)
+                    Toast.makeText(requireContext(), "Error updating appointment status. Err: $it", Toast.LENGTH_SHORT).show()
+                }
+            )
+            .addTo(disposables)
     }
 
     override fun onDestroyView() {

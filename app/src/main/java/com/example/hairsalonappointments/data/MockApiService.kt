@@ -253,12 +253,19 @@ class MockApiService {
     /**
      * Update appointment status
      */
-    fun updateAppointmentStatus(appointmentId: Int, newStatus: AppointmentStatus): Boolean {
+    fun updateAppointmentStatus(appointmentId: Int, newStatus: AppointmentStatus): Appointment? {
         Thread.sleep(200)
 
-        // In a real app, this would update the database
-        // For demo, just return success if appointment exists
-        return appointments.any { it.id == appointmentId }
+        val index = appointments.indexOfFirst { it.id == appointmentId }
+        if (index != -1) {
+            val updatedAppointment = appointments[index].copy(status = newStatus)
+            // In a real app, you would update the actual data source (e.g., database)
+            // For this mock, we'll simulate the update by replacing the item in the list
+            // Note: This is a simplified in-memory update and won't persist across app runs
+            (appointments as MutableList)[index] = updatedAppointment
+            return updatedAppointment
+        }
+        return null
     }
 
     /**
