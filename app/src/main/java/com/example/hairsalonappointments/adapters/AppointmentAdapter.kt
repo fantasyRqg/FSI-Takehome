@@ -13,10 +13,10 @@ import java.util.Locale
 
 /**
  * RecyclerView Adapter for displaying appointments
- * 
+ *
  * TASK FOR CANDIDATE:
  * Implement the required RecyclerView adapter methods.
- * 
+ *
  * Requirements:
  * - Properly inflate the item layout (item_appointment.xml)
  * - Bind appointment data to views
@@ -26,7 +26,6 @@ import java.util.Locale
  * - Use view binding (already set up in gradle)
  */
 class AppointmentAdapter(
-    private val onAppointmentClick: (Appointment) -> Unit,
     private val onAppointmentActionListener: OnAppointmentActionListener
 ) : RecyclerView.Adapter<AppointmentAdapter.AppointmentViewHolder>() {
 
@@ -34,17 +33,18 @@ class AppointmentAdapter(
         fun onConfirmClick(appointment: Appointment)
         fun onCancelClick(appointment: Appointment)
         fun onCompleteClick(appointment: Appointment)
+        fun onAppointmentClick(appointment: Appointment)
     }
-    
+
     private var appointments = emptyList<Appointment>()
     private val timeFormatter = SimpleDateFormat("h:mm a", Locale.getDefault())
-    
+
     /**
      *
      * Create and return a ViewHolder.
      * - Inflate the item_appointment layout using view binding
      * - Return a new AppointmentViewHolder instance
-     * 
+     *
      * @param parent The ViewGroup into which the new View will be added
      * @param viewType The view type of the new View
      * @return A new ViewHolder that holds a View for an appointment item
@@ -54,7 +54,7 @@ class AppointmentAdapter(
         val binding = ItemAppointmentBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return AppointmentViewHolder(binding)
     }
-    
+
     /**
      *
      * Bind appointment data to the views.
@@ -64,7 +64,7 @@ class AppointmentAdapter(
      * - Display time (format using timeFormatter)
      * - Display status with appropriate styling
      * - Set click listener to invoke onAppointmentClick
-     * 
+     *
      * @param holder The ViewHolder which should be updated
      * @param position The position of the item within the adapter's data set
      */
@@ -73,38 +73,38 @@ class AppointmentAdapter(
         // Bind all the data to the views
         // Set click listener
 
-        holder.bind(appointments[position], onAppointmentClick)
+        holder.bind(appointments[position])
     }
-    
+
     override fun getItemCount(): Int = appointments.size
-    
+
     /**
      * Update the adapter's data set
-     * 
+     *
      * @param newAppointments The new list of appointments to display
      */
     fun submitList(newAppointments: List<Appointment>) {
         appointments = newAppointments
         notifyDataSetChanged()
     }
-    
+
     /**
      * ViewHolder class for appointment items
-     * 
+     *
      * @param binding The view binding for the item layout
      */
     inner class AppointmentViewHolder(
         val binding: ItemAppointmentBinding
     ) : RecyclerView.ViewHolder(binding.root) {
-        
+
         /**
          * Bind an appointment to this view holder
-         * 
+         *
          * @param appointment The appointment to display
          * @param onClickListener The click listener for this item
          */
-        fun bind(appointment: Appointment, onClickListener: (Appointment) -> Unit) {
-            binding.root.setOnClickListener { onClickListener(appointment) }
+        fun bind(appointment: Appointment) {
+            binding.root.setOnClickListener { onAppointmentActionListener.onAppointmentClick(appointment) }
             binding.textViewStatus.text = appointment.status.name
             binding.textViewClientName.text = appointment.clientName
             binding.textViewTime.text = timeFormatter.format(appointment.appointmentTime)
@@ -123,11 +123,13 @@ class AppointmentAdapter(
                     binding.buttonCancel.visibility = View.VISIBLE
                     binding.buttonComplete.visibility = View.GONE
                 }
+
                 AppointmentStatus.CONFIRMED -> {
                     binding.buttonConfirm.visibility = View.GONE
                     binding.buttonCancel.visibility = View.VISIBLE
                     binding.buttonComplete.visibility = View.VISIBLE
                 }
+
                 else -> { // COMPLETED, CANCELLED
                     binding.buttonConfirm.visibility = View.GONE
                     binding.buttonCancel.visibility = View.GONE

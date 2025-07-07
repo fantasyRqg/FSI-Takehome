@@ -13,6 +13,7 @@ import com.example.hairsalonappointments.R
 import com.example.hairsalonappointments.adapters.AppointmentAdapter
 import com.example.hairsalonappointments.data.Appointment
 import com.example.hairsalonappointments.data.AppointmentStatus
+import com.example.hairsalonappointments.data.FilterCriteria
 import com.example.hairsalonappointments.data.MockApiService
 import com.example.hairsalonappointments.databinding.FragmentAppointmentListBinding
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -49,7 +50,7 @@ class AppointmentListFragment : Fragment(), AppointmentAdapter.OnAppointmentActi
     private lateinit var adapter: AppointmentAdapter
     private val apiService by lazy { MockApiService() }
     private var allAppointments = emptyList<Appointment>()
-    private var showingAllAppointments = true
+    private var currentFilterCriteria: FilterCriteria = FilterCriteria()
     private var searchQuery = ""
     private val disposables = CompositeDisposable()
     override fun onCreateView(
@@ -69,11 +70,11 @@ class AppointmentListFragment : Fragment(), AppointmentAdapter.OnAppointmentActi
         setupSearch()
         loadAppointments()
         setupFab()
+        setupFilterButton()
     }
 
     private fun setupRecyclerView() {
         adapter = AppointmentAdapter(
-            onAppointmentClick = { appointment -> onAppointmentClick(appointment) },
             onAppointmentActionListener = this
         )
 
@@ -85,17 +86,13 @@ class AppointmentListFragment : Fragment(), AppointmentAdapter.OnAppointmentActi
 
     private fun setupFilterToggle() {
         binding.chipGroupFilter.setOnCheckedStateChangeListener { _, checkedIds ->
-            when (checkedIds.firstOrNull()) {
-                R.id.chipAll -> {
-                    showingAllAppointments = true
-                    updateAppointmentList()
-                }
-
-                R.id.chipAvailable -> {
-                    showingAllAppointments = false
-                    updateAppointmentList()
-                }
+            val statusFilter = when (checkedIds.firstOrNull()) {
+                R.id.chipAll -> null
+                R.id.chipAvailable -> "Available" // Assuming "Available" is a status
+                else -> null
             }
+            currentFilterCriteria = currentFilterCriteria.copy(status = statusFilter)
+            updateAppointmentList()
         }
     }
 
@@ -103,6 +100,8 @@ class AppointmentListFragment : Fragment(), AppointmentAdapter.OnAppointmentActi
         binding.searchView.setOnQueryTextListener(object :
             androidx.appcompat.widget.SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
+                searchQuery = query.orEmpty()
+                updateAppointmentList()
                 return false
             }
 
@@ -124,15 +123,9 @@ class AppointmentListFragment : Fragment(), AppointmentAdapter.OnAppointmentActi
      * - Show empty state if no appointments
      * - Handle any errors gracefully
      */
-    private fun loadAppointments() {
-        // 1. Initialize MockApiService
-        // 2. Get today's appointments
-        // 3. Store in allAppointments
-        // 4. Update the RecyclerView
-        // 5. Handle empty state
-
+    private fun loadAppointments(filterCriteria: FilterCriteria = currentFilterCriteria) {
         Observable.fromCallable {
-            apiService.getTodaysAppointments()
+            apiService.getAppointments(filterCriteria)
         }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -141,11 +134,11 @@ class AppointmentListFragment : Fragment(), AppointmentAdapter.OnAppointmentActi
                     allAppointments = it
                     updateAppointmentList()
                 },
-                onError = {
-                    Log.e(TAG, "loadAppointments: $it", it)
+                onError = { error ->
+                    Log.e(TAG, "loadAppointments: $error", error)
                     Toast.makeText(
                         requireContext(),
-                        "Error loading appointments. Err: $it",
+                        "Error loading appointments. Err: $error",
                         Toast.LENGTH_SHORT
                     ).show()
                     updateEmptyState(true)
@@ -163,37 +156,44 @@ class AppointmentListFragment : Fragment(), AppointmentAdapter.OnAppointmentActi
      *
      * @param appointment The clicked appointment
      */
-    private fun onAppointmentClick(appointment: Appointment) {
+    override fun onAppointmentClick(appointment: Appointment) {
         // Use findNavController() and navigate with appointment ID
 
-        findNavController().navigate(
-            R.id.action_appointmentListFragment_to_appointmentDetailFragment,
-            Bundle().apply {
-                putInt("appointmentId", appointment.id)
-            })
-//        AppointmentListFragmentDirections.actionAppointmentListFragmentToAppointmentDetailFragment(appointment.id)
+        val action = AppointmentListFragmentDirections.actionAppointmentListFragmentToAppointmentDetailFragment(appointment.id)
+        findNavController().navigate(action)
     }
 
     /**
      * Update the displayed appointment list based on current filter
      */
     private fun updateAppointmentList() {
-        val appointmentsToShow = if (showingAllAppointments) {
-            allAppointments
-        } else {
-            // Show only pending and confirmed appointments (available for service)
-            allAppointments.filter {
-                it.status == AppointmentStatus.PENDING ||
-                        it.status == AppointmentStatus.CONFIRMED
-            }
-        }.filter {
-            if (searchQuery.isEmpty()) {
+        val appointmentsToShow = allAppointments.filter { appointment ->
+            val matchesSearch = if (searchQuery.isEmpty()) {
                 true
             } else {
-                it.clientName.contains(searchQuery, ignoreCase = true) ||
-                        it.stylistName.contains(searchQuery, ignoreCase = true)
+                appointment.clientName.contains(searchQuery, true) ||
+                        appointment.stylistName.contains(searchQuery, true)
             }
 
+            val matchesStylist = if (currentFilterCriteria.stylistId.isNullOrEmpty()) {
+                true
+            } else {
+                appointment.stylistName.equals(currentFilterCriteria.stylistId, true)
+            }
+
+            val matchesServiceType = if (currentFilterCriteria.serviceTypeId.isNullOrEmpty()) {
+                true
+            } else {
+                appointment.serviceType.name.equals(currentFilterCriteria.serviceTypeId, true)
+            }
+
+            val matchesStatus = if (currentFilterCriteria.status.isNullOrEmpty()) {
+                true
+            } else {
+                appointment.status.name.equals(currentFilterCriteria.status, ignoreCase = true)
+            }
+
+            matchesSearch && matchesStylist && matchesServiceType && matchesStatus
         }
 
         adapter.submitList(appointmentsToShow)
@@ -212,14 +212,25 @@ class AppointmentListFragment : Fragment(), AppointmentAdapter.OnAppointmentActi
         if (isEmpty) {
             binding.textViewEmpty.text = when {
                 searchQuery.isNotEmpty() -> "No appointments found for \"$searchQuery\""
-                showingAllAppointments -> "No appointments scheduled for today"
-                else -> "No available appointments"
+                currentFilterCriteria.stylistId != null || currentFilterCriteria.serviceTypeId != null || currentFilterCriteria.status != null -> "No appointments found with the selected filters"
+                else -> "No appointments scheduled for today"
             }
         }
     }
 
 
     private var isFabMenuOpen = false
+
+    private fun setupFilterButton() {
+        binding.filterButton.setOnClickListener {
+            val filterBottomSheet = FilterBottomSheetFragment.newInstance(currentFilterCriteria)
+            filterBottomSheet.onApplyFilter = { criteria ->
+                currentFilterCriteria = criteria
+                loadAppointments(currentFilterCriteria)
+            }
+            filterBottomSheet.show(parentFragmentManager, FilterBottomSheetFragment.TAG)
+        }
+    }
 
     private fun setupFab() {
         binding.fabMenu.setOnClickListener {
@@ -300,16 +311,16 @@ class AppointmentListFragment : Fragment(), AppointmentAdapter.OnAppointmentActi
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onNext = { updatedAppointment: Appointment? ->
-                    updatedAppointment?.let {
-                        Toast.makeText(requireContext(), "Appointment status updated to ${it.status.name}", Toast.LENGTH_SHORT).show()
+                    updatedAppointment?.let { updated ->
+                        Toast.makeText(requireContext(), "Appointment status updated to ${updated.status.name}", Toast.LENGTH_SHORT).show()
                         loadAppointments() // Refresh the list
                     } ?: run {
                         Toast.makeText(requireContext(), "Failed to update appointment status.", Toast.LENGTH_SHORT).show()
                     }
                 },
-                onError = {
-                    Log.e(TAG, "updateAppointmentStatus: $it", it)
-                    Toast.makeText(requireContext(), "Error updating appointment status. Err: $it", Toast.LENGTH_SHORT).show()
+                onError = { error ->
+                    Log.e(TAG, "updateAppointmentStatus: $error", error)
+                    Toast.makeText(requireContext(), "Error updating appointment status. Err: $error", Toast.LENGTH_SHORT).show()
                 }
             )
             .addTo(disposables)

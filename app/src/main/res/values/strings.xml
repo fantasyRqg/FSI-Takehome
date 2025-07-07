@@ -49,4 +49,10 @@
     <string name="error_loading_previous_visits">Error loading previous visits: %1$s</string>
     <string name="service_duration_minutes">%1$d minutes</string>
     <string name="no_previous_visits_found_for_this_client">No previous visits found for this client.</string>
+    <string name="filter_appointments">Filter Appointments</string>
+    <string name="stylist">Stylist</string>
+    <string name="service_type">Service Type</string>
+    <string name="status">Status</string>
+    <string name="apply_filters">Apply Filters</string>
+    <string name="clear_filters">Clear Filters</string>
 </resources>

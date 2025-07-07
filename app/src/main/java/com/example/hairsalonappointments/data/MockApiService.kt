@@ -100,10 +100,24 @@ class MockApiService {
      *
      * @return List of appointments for today
      */
-    fun getTodaysAppointments(): List<Appointment> {
+    fun getAppointments(filter: FilterCriteria? = null): List<Appointment> {
         // Simulate a small delay that would occur with a real API call
         Thread.sleep(300)
-        return appointments
+        var filteredAppointments = appointments
+
+        filter?.stylistId?.let { stylistId ->
+            filteredAppointments = filteredAppointments.filter { it.stylistName.equals(stylistId, ignoreCase = true) }
+        }
+
+        filter?.serviceTypeId?.let { serviceTypeId ->
+            filteredAppointments = filteredAppointments.filter { it.serviceType.name.equals(serviceTypeId, ignoreCase = true) }
+        }
+
+        filter?.status?.let { status ->
+            filteredAppointments = filteredAppointments.filter { it.status.name.equals(status, ignoreCase = true) }
+        }
+
+        return filteredAppointments
     }
 
     /**
